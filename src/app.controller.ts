@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
 import { performance } from 'perf_hooks';
+import * as Queue from 'better-queue'
 
 @Controller()
 export class AppController {
@@ -19,16 +19,31 @@ export class AppController {
 
     let start = performance.now();
 
-    let meaningless = 0;
+    
+    let q = new Queue(function (input, cb) {
+      
+      let start2 = performance.now();
 
-    for(let i = 0; i < 10000; i++){
-      for(let j = 0; j < 1000; j++){
-        for(let k = 0; k < 1000; k++){
-          meaningless++;
-        }
-      } 
-    }
+      let meaningless = input;
 
+      for(let i = 0; i < 10000; i++){
+        for(let j = 0; j < 1000; j++){
+          for(let k = 0; k < 1000; k++){
+            meaningless++;
+          }
+        } 
+      }
+    
+
+      let end2 = performance.now();
+
+      console.log(`done in ${end2 - start2} milliseconds`);
+
+      cb(null, meaningless);
+    })
+ 
+    q.push(0)
+    
     let end = performance.now();
 
     return `done in ${end - start} milliseconds`;
